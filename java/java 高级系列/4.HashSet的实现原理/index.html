@@ -1,0 +1,704 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    
+
+    <title>4.HashSet的实现原理 | 程序员Sherwin</title>
+    <meta name="author" content="Sherwin Wei">
+    
+    <meta name="description" content="1.    HashSet概述：&amp;emsp;&amp;emsp; HashSet实现Set接口，由哈希表（实际上是一个HashMap实例）支持。它不保证set 的迭代顺序；特别是它不保证该顺序恒久不变。此类允许使用null元素。
+2.    HashSet的实现：&amp;emsp;&amp;emsp; 对于HashSet">
+    
+
+   
+   <meta name="keywords" content="java高级系列,魏远标,Sherwin,java程序员,程序员Sherwin,程序员魏远标">
+   
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta property="og:title" content="4.HashSet的实现原理">
+    <meta property="og:site_name" content="程序员Sherwin">
+
+    
+    <meta property="og:image" content="">
+    
+
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="alternate" href="/atom.xml" title="程序员Sherwin" type="application/atom+xml">
+    <link rel="stylesheet" href="/css/lib/materialize.min.css">
+    <link rel="stylesheet" href="/css/lib/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+    
+        <link rel="stylesheet" href="/css/lib/prettify-tomorrow-night-eighties.css" type="text/css">
+    
+    <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+</head>
+</html>
+
+<body>
+    <img src="/weixin_favicon.png" style="position: absolute; left: -9999px; opacity: 0; filter: alpha(opacity=0);">
+
+    <nav class="indigo">
+    <div class="nav-wrapper">
+        <a href="#" data-activates="main-menu" class="button-collapse">
+            <i class="fa fa-navicon"></i>
+        </a>
+        <div class="">
+            <a href="/" class="brand-logo hide-on-med-and-down">程序员Sherwin</a>
+            <ul class="right hide-on-med-and-down">
+                
+                    <li>
+                        <a class="menu-home " href="/">
+                            <i class="fa fa-home "></i>
+                            
+                            首页
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a class="menu-archive " href="/archives">
+                            <i class="fa fa-archive "></i>
+                            
+                            归档
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a class="menu-category category-menu" href="javascript:;" data-activates="category-menu">
+                            <i class="fa fa-bookmark "></i>
+                            
+                            分类
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a class="menu-reading " href="/reading">
+                            <i class="fa fa-book "></i>
+                            
+                            读书
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a class="menu-about " href="/about">
+                            <i class="fa fa-user "></i>
+                            
+                            关于
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a class="menu-search modal-trigger " href="#search">
+                            <i class="fa fa-search "></i>
+                            
+                            搜索
+                        </a>
+                    </li>
+                
+            </ul>
+            <div>
+    <ul class="side-nav indigo darken-1" id="main-menu">
+        
+        <li class="side-user">
+            <div class="row">
+                <div class="col s4 no-padding">
+                    <img class="avatar-image circle responsive-img" src="http://p5zbw6dku.bkt.clouddn.com/18-3-27/79800938.jpg" alt="User Avatar">
+                </div>
+                <div class="info col s8 valign-wrapper no-padding">
+                    <div class="valign">
+                        <p class="name">魏远标</p>
+                        <p class="desc">Java后端/全栈</p>
+                    </div>
+                </div>
+            </div>
+        </li>
+        
+
+        
+            <li class="no-padding">
+                <a class="waves-effect menu-home " href="/">
+                    <i class="fa fa-home "></i>
+                    
+                    首页
+                </a>
+            </li>
+        
+            <li class="no-padding">
+                <a class="waves-effect menu-archive " href="/archives">
+                    <i class="fa fa-archive "></i>
+                    
+                    归档
+                </a>
+            </li>
+        
+            <li class="no-padding">
+                <a class="waves-effect menu-category category-menu" href="javascript:;" data-activates="category-menu">
+                    <i class="fa fa-bookmark "></i>
+                    
+                    分类
+                </a>
+            </li>
+        
+            <li class="no-padding">
+                <a class="waves-effect menu-reading " href="/reading">
+                    <i class="fa fa-book "></i>
+                    
+                    读书
+                </a>
+            </li>
+        
+            <li class="no-padding">
+                <a class="waves-effect menu-about " href="/about">
+                    <i class="fa fa-user "></i>
+                    
+                    关于
+                </a>
+            </li>
+        
+            <li class="no-padding">
+                <a class="waves-effect menu-search modal-trigger " href="#search">
+                    <i class="fa fa-search "></i>
+                    
+                    搜索
+                </a>
+            </li>
+        
+    </ul>
+
+    <ul class="side-nav indigo darken-1" id="category-menu">
+    
+
+            
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/生活/">
+                    生活 <span class="right">7 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/java/">
+                    java <span class="right">3 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/web前端/">
+                    web前端 <span class="right">1 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/linux/">
+                    linux <span class="right">2 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/网络/">
+                    网络 <span class="right">1 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/java高级系列/">
+                    java高级系列 <span class="right">12 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/java面试/">
+                    java面试 <span class="right">3 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/jvm/">
+                    jvm <span class="right">2 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/mybatis/">
+                    mybatis <span class="right">1 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/spring/">
+                    spring <span class="right">1 篇</span></a>
+                
+            </li>
+
+        
+
+            <li class="collapse-level-0" collapse-level="0">
+                <a class="no-padding" href="/categories/juc/">
+                    juc <span class="right">1 篇</span></a>
+                
+            </li>
+
+        
+
+    </ul>
+</div>
+
+        </div>
+    </div>
+</nav>
+
+<div id="search" class="modal search-modal">
+    <div class="row">
+        <div class="input-field col s12">
+              <input id="search-input" type="text">
+              <label for="search-input">搜索</label>
+        </div>
+
+    </div>
+    <div id="search-result" class="search-result col s12">
+
+    </div>
+</div>
+
+
+    <main>
+        <div class="container main-container">
+    <nav class="page-nav hide-on-small-only">
+    <div class="nav-wrapper indigo">
+        <span class="breadcrumb">当前位置（分类目录）</span>
+        
+            
+    
+    
+    <a class="breadcrumb" href="/categories/java高级系列/">java高级系列</a>
+
+
+        
+
+        
+    </div>
+</nav>
+
+<article>
+    <div class="card">
+        <div class="card-content">
+            
+
+            <div class="article-title">
+                
+    
+        <h1>4.HashSet的实现原理</h1>
+    
+
+
+            </div>
+            <time class="pink-link-context" datetime="2018-06-05T08:08:28.000Z"><a href="/java/java 高级系列/4.HashSet的实现原理/">2018-06-05</a></time>
+
+            <span id="busuanzi_container_page_pv" class="read-times-container">
+    <i class="fa fa-eye"></i>
+    <span id="busuanzi_value_page_pv"></span>
+</span>
+
+            
+    <div class="tags-row">
+        
+            <a href="/tags/java高级系列/" class="chip pink lighten-1">java高级系列</a>
+        
+    </div>
+
+
+            <div class="toc pink-link-context hide-on-med-and-down">
+    <ol class="section table-of-contents"><li class="section table-of-contents-item section table-of-contents-level-3"><a class="section table-of-contents-link" href="#1-HashSet概述："><span class="section table-of-contents-text">1.    HashSet概述：</span></a></li><li class="section table-of-contents-item section table-of-contents-level-3"><a class="section table-of-contents-link" href="#2-HashSet的实现："><span class="section table-of-contents-text">2.    HashSet的实现：</span></a></li></ol>
+</div>
+
+
+            <div class="entry pink-link-context">
+                <h3 id="1-HashSet概述："><a href="#1-HashSet概述：" class="headerlink" title="1.    HashSet概述："></a>1.    HashSet概述：</h3><p>&emsp;&emsp; HashSet实现Set接口，由哈希表（实际上是一个HashMap实例）支持。它不保证set 的迭代顺序；特别是它不保证该顺序恒久不变。此类允许使用null元素。</p>
+<h3 id="2-HashSet的实现："><a href="#2-HashSet的实现：" class="headerlink" title="2.    HashSet的实现："></a>2.    HashSet的实现：</h3><p>&emsp;&emsp; 对于HashSet而言，它是基于HashMap实现的，HashSet底层使用HashMap来保存所有元素，因此HashSet 的实现比较简单，相关HashSet的操作，基本上都是直接调用底层HashMap的相关方法来完成， HashSet的源代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><span class="line">public class HashSet&lt;E&gt;  </span><br><span class="line">    extends AbstractSet&lt;E&gt;  </span><br><span class="line">    implements Set&lt;E&gt;, Cloneable, java.io.Serializable  </span><br><span class="line">&#123;  </span><br><span class="line">    static final long serialVersionUID = -5024744406713321676L;  </span><br><span class="line">  </span><br><span class="line">    // 底层使用HashMap来保存HashSet中所有元素。  </span><br><span class="line">    private transient HashMap&lt;E,Object&gt; map;  </span><br><span class="line">      </span><br><span class="line">    // 定义一个虚拟的Object对象作为HashMap的value，将此对象定义为static final。  </span><br><span class="line">    private static final Object PRESENT = new Object();  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 默认的无参构造器，构造一个空的HashSet。 </span><br><span class="line">     *  </span><br><span class="line">     * 实际底层会初始化一个空的HashMap，并使用默认初始容量为16和加载因子0.75。 </span><br><span class="line">     */  </span><br><span class="line">    public HashSet() &#123;  </span><br><span class="line">    map = new HashMap&lt;E,Object&gt;();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 构造一个包含指定collection中的元素的新set。 </span><br><span class="line">     * </span><br><span class="line">     * 实际底层使用默认的加载因子0.75和足以包含指定 </span><br><span class="line">     * collection中所有元素的初始容量来创建一个HashMap。 </span><br><span class="line">     * @param c 其中的元素将存放在此set中的collection。 </span><br><span class="line">     */  </span><br><span class="line">    public HashSet(Collection&lt;? extends E&gt; c) &#123;  </span><br><span class="line">    map = new HashMap&lt;E,Object&gt;(Math.max((int) (c.size()/.75f) + 1, 16));  </span><br><span class="line">    addAll(c);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 以指定的initialCapacity和loadFactor构造一个空的HashSet。 </span><br><span class="line">     * </span><br><span class="line">     * 实际底层以相应的参数构造一个空的HashMap。 </span><br><span class="line">     * @param initialCapacity 初始容量。 </span><br><span class="line">     * @param loadFactor 加载因子。 </span><br><span class="line">     */  </span><br><span class="line">    public HashSet(int initialCapacity, float loadFactor) &#123;  </span><br><span class="line">    map = new HashMap&lt;E,Object&gt;(initialCapacity, loadFactor);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 以指定的initialCapacity构造一个空的HashSet。 </span><br><span class="line">     * </span><br><span class="line">     * 实际底层以相应的参数及加载因子loadFactor为0.75构造一个空的HashMap。 </span><br><span class="line">     * @param initialCapacity 初始容量。 </span><br><span class="line">     */  </span><br><span class="line">    public HashSet(int initialCapacity) &#123;  </span><br><span class="line">    map = new HashMap&lt;E,Object&gt;(initialCapacity);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 以指定的initialCapacity和loadFactor构造一个新的空链接哈希集合。 </span><br><span class="line">     * 此构造函数为包访问权限，不对外公开，实际只是是对LinkedHashSet的支持。 </span><br><span class="line">     * </span><br><span class="line">     * 实际底层会以指定的参数构造一个空LinkedHashMap实例来实现。 </span><br><span class="line">     * @param initialCapacity 初始容量。 </span><br><span class="line">     * @param loadFactor 加载因子。 </span><br><span class="line">     * @param dummy 标记。 </span><br><span class="line">     */  </span><br><span class="line">    HashSet(int initialCapacity, float loadFactor, boolean dummy) &#123;  </span><br><span class="line">    map = new LinkedHashMap&lt;E,Object&gt;(initialCapacity, loadFactor);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 返回对此set中元素进行迭代的迭代器。返回元素的顺序并不是特定的。 </span><br><span class="line">     *  </span><br><span class="line">     * 底层实际调用底层HashMap的keySet来返回所有的key。 </span><br><span class="line">     * 可见HashSet中的元素，只是存放在了底层HashMap的key上， </span><br><span class="line">     * value使用一个static final的Object对象标识。 </span><br><span class="line">     * @return 对此set中元素进行迭代的Iterator。 </span><br><span class="line">     */  </span><br><span class="line">    public Iterator&lt;E&gt; iterator() &#123;  </span><br><span class="line">    return map.keySet().iterator();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 返回此set中的元素的数量（set的容量）。 </span><br><span class="line">     * </span><br><span class="line">     * 底层实际调用HashMap的size()方法返回Entry的数量，就得到该Set中元素的个数。 </span><br><span class="line">     * @return 此set中的元素的数量（set的容量）。 </span><br><span class="line">     */  </span><br><span class="line">    public int size() &#123;  </span><br><span class="line">    return map.size();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 如果此set不包含任何元素，则返回true。 </span><br><span class="line">     * </span><br><span class="line">     * 底层实际调用HashMap的isEmpty()判断该HashSet是否为空。 </span><br><span class="line">     * @return 如果此set不包含任何元素，则返回true。 </span><br><span class="line">     */  </span><br><span class="line">    public boolean isEmpty() &#123;  </span><br><span class="line">    return map.isEmpty();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 如果此set包含指定元素，则返回true。 </span><br><span class="line">     * 更确切地讲，当且仅当此set包含一个满足(o==null ? e==null : o.equals(e)) </span><br><span class="line">     * 的e元素时，返回true。 </span><br><span class="line">     * </span><br><span class="line">     * 底层实际调用HashMap的containsKey判断是否包含指定key。 </span><br><span class="line">     * @param o 在此set中的存在已得到测试的元素。 </span><br><span class="line">     * @return 如果此set包含指定元素，则返回true。 </span><br><span class="line">     */  </span><br><span class="line">    public boolean contains(Object o) &#123;  </span><br><span class="line">    return map.containsKey(o);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 如果此set中尚未包含指定元素，则添加指定元素。 </span><br><span class="line">     * 更确切地讲，如果此 set 没有包含满足(e==null ? e2==null : e.equals(e2)) </span><br><span class="line">     * 的元素e2，则向此set 添加指定的元素e。 </span><br><span class="line">     * 如果此set已包含该元素，则该调用不更改set并返回false。 </span><br><span class="line">     * </span><br><span class="line">     * 底层实际将将该元素作为key放入HashMap。 </span><br><span class="line">     * 由于HashMap的put()方法添加key-value对时，当新放入HashMap的Entry中key </span><br><span class="line">     * 与集合中原有Entry的key相同（hashCode()返回值相等，通过equals比较也返回true）， </span><br><span class="line">     * 新添加的Entry的value会将覆盖原来Entry的value，但key不会有任何改变， </span><br><span class="line">     * 因此如果向HashSet中添加一个已经存在的元素时，新添加的集合元素将不会被放入HashMap中， </span><br><span class="line">     * 原来的元素也不会有任何改变，这也就满足了Set中元素不重复的特性。 </span><br><span class="line">     * @param e 将添加到此set中的元素。 </span><br><span class="line">     * @return 如果此set尚未包含指定元素，则返回true。 </span><br><span class="line">     */  </span><br><span class="line">    public boolean add(E e) &#123;  </span><br><span class="line">    return map.put(e, PRESENT)==null;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 如果指定元素存在于此set中，则将其移除。 </span><br><span class="line">     * 更确切地讲，如果此set包含一个满足(o==null ? e==null : o.equals(e))的元素e， </span><br><span class="line">     * 则将其移除。如果此set已包含该元素，则返回true </span><br><span class="line">     * （或者：如果此set因调用而发生更改，则返回true）。（一旦调用返回，则此set不再包含该元素）。 </span><br><span class="line">     * </span><br><span class="line">     * 底层实际调用HashMap的remove方法删除指定Entry。 </span><br><span class="line">     * @param o 如果存在于此set中则需要将其移除的对象。 </span><br><span class="line">     * @return 如果set包含指定元素，则返回true。 </span><br><span class="line">     */  </span><br><span class="line">    public boolean remove(Object o) &#123;  </span><br><span class="line">    return map.remove(o)==PRESENT;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 从此set中移除所有元素。此调用返回后，该set将为空。 </span><br><span class="line">     * </span><br><span class="line">     * 底层实际调用HashMap的clear方法清空Entry中所有元素。 </span><br><span class="line">     */  </span><br><span class="line">    public void clear() &#123;  </span><br><span class="line">    map.clear();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    /** </span><br><span class="line">     * 返回此HashSet实例的浅表副本：并没有复制这些元素本身。 </span><br><span class="line">     * </span><br><span class="line">     * 底层实际调用HashMap的clone()方法，获取HashMap的浅表副本，并设置到HashSet中。 </span><br><span class="line">     */  </span><br><span class="line">    public Object clone() &#123;  </span><br><span class="line">        try &#123;  </span><br><span class="line">            HashSet&lt;E&gt; newSet = (HashSet&lt;E&gt;) super.clone();  </span><br><span class="line">            newSet.map = (HashMap&lt;E, Object&gt;) map.clone();  </span><br><span class="line">            return newSet;  </span><br><span class="line">        &#125; catch (CloneNotSupportedException e) &#123;  </span><br><span class="line">            throw new InternalError();  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+                
+<p class="pink-link-context">
+    <a href="/java/java 高级系列/5.LinkedHashSet的实现原理/" rel="next" title="5.LinkedHashSet的实现原理">
+    上一篇：5.LinkedHashSet的实现原理
+  </a>
+</p>
+
+
+
+<p class="pink-link-context">
+    <a href="/java/java 高级系列/3.LinkedHashMap的实现原理/" rel="next" title="3.LinkedHashMap的实现原理">
+    下一篇：3.LinkedHashMap的实现原理
+  </a>
+</p>
+
+
+            </div>
+			
+        </div>
+    </div>
+</article>
+
+
+
+
+    <section id="comments">
+        <!--高速版，加载速度快，使用前需测试页面的兼容性-->
+        <div id="SOHUCS" sid="4.HashSet的实现原理"></div>
+        <script>
+          (function(){
+            var appid = 'cytwu2Jh8',
+            conf = 'prod_f36aa8fb3548cb02167fd6c482acf807';
+            var doc = document,
+            s = doc.createElement('script'),
+            h = doc.getElementsByTagName('head')[0] || doc.head || doc.documentElement;
+            s.type = 'text/javascript';
+            s.charset = 'utf-8';
+            s.src =  'http://assets.changyan.sohu.com/upload/changyan.js?conf='+ conf +'&appid=' + appid;
+            h.insertBefore(s,h.firstChild);
+            window.SCS_NO_IFRAME = true;
+          })()
+        </script>    
+    </section>
+
+
+
+
+
+</div>
+
+        <div class="fixed-action-btn float-sitemap">
+    <a class="btn-floating btn-large pink">
+      <i class="fa fa-caret-square-o-up"></i>
+    </a>
+    <ul>
+      <li><a class="btn-return-top btn-floating waves-effect green" title="回到顶部"><i class="fa fa-arrow-circle-o-up"></i></a></li>
+      <li><a class="btn-floating waves-effect button-collapse yellow darken-1" data-activates="main-menu" title="菜单"><i class="fa fa-navicon"></i></a></li>
+    </ul>
+  </div>
+
+    </main>
+    <footer class="page-footer indigo darken-1">
+    
+    <div class="footer-container container">
+        <div class="row">
+            
+            <div class="social-group col m4 s12">
+                <h5 class="white-text">社交</h5>
+                
+                    <a class="social-link" href="https://weibo.com/1903200010" target="_blank">
+                        <i class="fa fa-2x fa-weibo"></i>
+                    </a>
+                
+                    <a class="social-link" href="https://github.com/sherwin28" target="_blank">
+                        <i class="fa fa-2x fa-github"></i>
+                    </a>
+                
+                    <a class="social-link" href="/atom.xml" target="_blank">
+                        <i class="fa fa-2x fa-rss"></i>
+                    </a>
+                
+                
+     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <div class="site-visitors-container white-text">
+        <span>
+            <i class="fa fa-user"></i>
+            <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+        </span>
+        <span>&nbsp;|&nbsp;</span>
+        <span>
+            <i class="fa fa-eye"></i>
+            <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+        </span>
+    </div>
+
+
+            </div>
+            
+
+            
+            <div class="col m8 s12">
+                <h5 class="white-text">友情链接</h5>
+                
+                    <a class="social-link" href="http://blog.didispace.com/" target="_blank">程序猿DD</a>
+                
+                    <a class="social-link" href="https://springcloud.cc/" target="_blank">Spring Cloud中文网</a>
+                
+                    <a class="social-link" href="http://itmuch.com/" target="_blank">周立|Spring Cloud </a>
+                
+            </div>
+            
+        </div>
+    </div>
+    
+
+    <div class="footer-copyright pink-link-context">
+        <div class="container">
+            © 2018 weiyuanbiao.cn, All rights reserved.
+            <a href="http://weiyuanbiao.cn" style="margin-left:10px;">weiyuanbiao.cn</a>
+            <a href="http://www.miitbeian.gov.cn" target="_blank" style="margin-left:10px;">粤ICP备15018188号-1</a>
+            <!-- 
+            <p class="right" style="margin-top: 0;">本博客由 <a href="https://hexo.io">Hexo</a> 强力驱动 | 主题 <a href="https://github.com/raytaylorlin/hexo-theme-raytaylorism">raytaylorism</a></p>
+            -->
+        </div>
+    </div>
+</footer>
+
+
+<noscript>
+    <div class="noscript">
+        <p class="center-align">当前网速较慢或者你使用的浏览器不支持博客特定功能，请尝试刷新或换用Chrome、Firefox等现代浏览器</p>
+    </div>
+</noscript>
+<div class="noscript">
+    <p class="center-align">当前网速较慢或者你使用的浏览器不支持博客特定功能，请尝试刷新或换用Chrome、Firefox等现代浏览器</p>
+</div>
+
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/materialize.min.js"></script>
+
+<script>
+    (function($) {
+        $(document).ready(function() {
+            // 隐藏禁用javascript（针对微信内置浏览器）的提示
+            $('.noscript').hide();
+
+            // 图片缩放效果
+            var $imgs = $('img').not('.slider-image').not('.avatar-image').not('.carousel-image').not('.card-cover-image').not('.qrcode');
+
+            // 给图片加上点击放大效果（materialbox插件）
+            $imgs.addClass('materialboxed').each(function(i, el) {
+                $(this).attr('data-caption', $(this).attr('alt') || ' ');
+            }).materialbox();
+
+            // 优化表格的显示
+            $('table').each(function() {
+                var $table = $(this);
+                // 除去多行代码的情况
+                if ($table.find('pre').length == 0) {
+                    $table.addClass('responsive-table striped bordered');
+                }
+            });
+
+            // 首页幻灯片
+            $('.slider').slider({indicators: true, full_width: true, interval: 8000});
+
+            $(".button-collapse").sideNav();
+            $(".category-menu").sideNav();
+
+            // 针对gallery post
+            $('.carousel').carousel({full_width: true});
+            $('.carousel-control.prev').click(function() {
+                $('.carousel').carousel('prev');
+            });
+            $('.carousel-control.next').click(function() {
+                $('.carousel').carousel('next');
+            });
+
+            // 文章目录
+            $('article').not('.simple-article').find('h1').add('h2').add('h3').add('h4').add('h5').add('h6').scrollSpy();
+
+            // 目录随屏幕滚动（防止目录过长越过footer）
+            var $toc = $('.toc');
+            var scrollTargetTop = 0;
+            $(window).scroll(function() {
+                var $activeLink = $toc.find('a.active.section');
+                if ($(window).scrollTop() < 100) {
+                    scrollTargetTop = 0;
+                } else {
+                    if ($activeLink[0]) {
+                        scrollTargetTop = $activeLink.offset().top - $toc.offset().top;
+                    }
+                }
+                $toc.css('top', '-' + scrollTargetTop + 'px');
+            });
+
+            // 修正文章目录的left-border颜色
+            var color = $('.table-of-contents-text').css('color');
+            $('.table-of-contents-link').css('border-left-color', color);
+
+            // 针对移动端做的优化：FAB按钮点击一下收回
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                $('.fixed-action-btn').addClass('click-to-toggle');
+            }
+            // 回到顶部
+            $('.btn-return-top').click(function() {
+                $('body, html').animate({
+                    scrollTop: 0
+                }, 500);
+            });
+
+            // 重置读书页面的Tab标签页的颜色
+            $('li.tab a').hover(function() {
+                $(this).toggleClass('text-lighten-4');
+            });
+            $('.indicator').addClass('pink lighten-2');
+
+            
+            // 添加new标签
+            $('.menu-reading').append('<span class="new badge pink"></span>');
+            
+
+            // 搜索功能
+            $('.modal-trigger').leanModal({
+                // 打开搜索框时自动聚焦
+                ready: function() {
+                    if ($('#search').is(":visible")) {
+                        $('#search-input').focus();
+                    }
+                }
+            });
+            var searchXml = "search.xml";
+            if (searchXml.length == 0) {
+             	searchXml = "search.xml";
+            }
+            var searchPath = "/" + searchXml;
+            initSearch(searchPath, 'search-input', 'search-result');
+        });
+
+        // 初始化搜索与匹配函数
+        var initSearch = function(path, search_id, content_id) {
+            'use strict';
+            $.ajax({
+                url: path,
+                dataType: "xml",
+                success: function(xmlResponse) {
+                    // get the contents from search data
+                    var datas = $("entry", xmlResponse).map(function() {
+                        return {
+                            title: $("title", this).text(),
+                            content: $("content", this).text(),
+                            url: $("url", this).text()
+                        };
+                    }).get();
+                    var $input = document.getElementById(search_id);
+                    var $resultContent = document.getElementById(content_id);
+                    $input.addEventListener('input', function() {
+                        var str = '<ul class=\"search-result-list\">';
+                        var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                        $resultContent.innerHTML = "";
+                        if (this.value.trim().length <= 0) {
+                            return;
+                        }
+                        // perform local searching
+                        datas.forEach(function(data) {
+                            var isMatch = true;
+                            var content_index = [];
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty titles and contents
+                            if (data_title != '' && data_content != '') {
+                                keywords.forEach(function(keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            }
+                            // show search results
+                            if (isMatch) {
+                                keywords.forEach(function(keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    data_title = data_title.replace(regS, "<span class=\"search-keyword pink lighten-2\">" + keyword + "</span>");
+                                });
+
+                                str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 100 characters
+                                    var start = first_occur - 20;
+                                    var end = first_occur + 80;
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+                                    if (start == 0) {
+                                        end = 100;
+                                    }
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+                                    var match_content = content.substring(start, end);
+                                    // highlight all keywords
+                                    keywords.forEach(function(keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, "<span class=\"search-keyword pink lighten-2\">" + keyword + "</span>");
+                                    });
+
+                                    str += "<p class=\"search-result\">..." + match_content + "...</p>"
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        $resultContent.innerHTML = str;
+                    });
+                }
+            });
+        }
+    })(jQuery);
+</script>
+
+
+<script src="/js/prettify.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+    });
+</script>
+
+
+
+
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=65472120" charset="UTF-8"></script>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+
+
+
+</body>
+</html>

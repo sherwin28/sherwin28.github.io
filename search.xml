@@ -243,17 +243,6 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[mybatis3 中provider的使用]]></title>
-    <url>%2Fjava%2Fmybatis%2Fmybatis%20provider%20%E7%9A%84%E4%BD%BF%E7%94%A8%2F</url>
-    <content type="text"><![CDATA[mybatis3提供了4个**provider注解，分别对应增删改查，分别是:InsertProvider、DeleteProvider、UpdateProvider、SelectProvider;如何使用这些注解呢？ 1.这些注解都有统一的2个入参，一个是type，一个是method。type参数的值是你动态sql的类（A）class文件，method是类（A）中的方法名。当然，这些方法都是动态sql，至于动态sql怎么实现，这就可以发挥你的java基础能力，我是结合了自定义注解和java反射基础知识实现了动态sql。下面结合代码讲解一下实现过程。 2.首先你需要定义一个接口类，这个类提供各种各样的增删改查方法。 下面以@SelectProvider为例，依次描述几种典型的使用场景。 1.使用@SelectProvider@SelectProvider是声明在方法基本上的，这个方法定义在Mapper对应的的interface上。 12345public interface UserMapper &#123; @SelectProvider(type = SqlProvider.class, method = "selectUser") @ResultMap("userMap") public User getUser(long userId);&#125; 上例中是个很简单的Mapper接口，其中定义了一个方法：getUser，这个方法根据提供的用户id来查询用户信息，并返回一个User实体bean。这是一个很简单很常用的查询场景：根据key来查询记录并将结果封装成实体bean。其中：@SelectProvider注解用于生成查询用的sql语句，有别于@Select注解，@SelectProvide指定一个Class及其方法，并且通过调用Class上的这个方法来获得sql语句。在我们这个例子中，获取查询sql的方法是SqlProvider.selectUser。@ResultMap注解用于从查询结果集RecordSet中取数据然后拼装实体bean。 2.定义拼装sql的类@SelectProvide中type参数指定的Class类，必须要能够通过无参的构造函数来初始化。@SelectProvide中method参数指定的方法，必须是public的，返回值必须为String，可以为static。12345public class SqlProvider &#123; public String selectUser(long userId) &#123; return "select * from user where userId=" + userId; &#125;&#125; 上面的就是个简单使用，就可以在mybatis中拼接sql了，有这个之后就可以改造mybatis用实体来查询了，就像hibernate一样了。 附加几个mybatis中不常用但很有意思的OGNL用法。 e.method(args) : 调用对象的方法 e.property： 对象属性值，可以多层嵌套使用， e1[e2] :按索引取值（list，数组和map，map使用的时候注意key一样的存在，不存在会报错的） @class@method(args):调用类的静态方法 @class@field:调用类的静态字段值]]></content>
-      <categories>
-        <category>mybatis</category>
-      </categories>
-      <tags>
-        <tag>mybatis</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[centos安装常用工具]]></title>
     <url>%2Flinux%2Fcentos%E5%AE%89%E8%A3%85%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%2F</url>
     <content type="text"><![CDATA[1、jdk安装去官网找到最新或者想要下载的版本的连接。通过wget获取。推荐用tar方式安装。 解压 tar -xvzf jdk-7u25-linux-x64.tar.gz -C /opt/jvm/ cd /opt/jvm 重命名 mv jdk... jdk7 vi /etc/profile 插入 #java env JAVA_HOME=/home/gcs/user/java/jdk1.7.0_67 PATH=$JAVA_HOME/bin:$PATH CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar export JAVA_HOME export PATH export CLASSPATH 生效 source /etc/profile 检查 java -version javac 2、安装mysql5.71、配置YUM源在MySQL官网中下载YUM源rpm安装包：http://dev.mysql.com/downloads/repo/yum/(可以去官网找最新的)下载mysql源安装包shell&gt; wget http://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm检查mysql源是否安装成功shell&gt; yum repolist enabled | grep “mysql.-community.“看到上图所示表示安装成功 2、安装MySQLshell&gt; yum install mysql-community-server 3、启动MySQL服务 shell&gt; systemctl start mysqld 查看MySQL的启动状态 shell&gt; systemctl status mysqld mysqld.service - MySQL Server Loaded: loaded (/usr/lib/systemd/system/mysqld.service; disabled; vendor preset: disabled) Active: active (running) since 五 2016-06-2404:37:37 CST; 35min ago Main PID: 2888 (mysqld) CGroup: /system.slice/mysqld.service └─2888 /usr/sbin/mysqld –daemonize –pid-file=/var/run/mysqld/mysqld.pid6月 2404:37:36 localhost.localdomain systemd[1]: Starting MySQL Server…6月 2404:37:37 localhost.localdomain systemd[1]: Started MySQL Server.4、开机启动 shell&gt; systemctl enable mysqldshell&gt; systemctl daemon-reload 5、修改root默认密码mysql安装完成之后，在/var/log/mysqld.log文件中给root生成了一个默认密码。通过下面的方式找到root默认密码，然后登录mysql进行修改： shell&gt; grep &apos;temporary password&apos; /var/log/mysqld.log shell&gt; mysql -uroot-pmysql&gt; ALTER USER &apos;root&apos;@&apos;localhost&apos; IDENTIFIED BY&apos;MyNewPass4!&apos;; 或者 mysql&gt; set password for&apos;root&apos;@&apos;localhost&apos;=password(&apos;MyNewPass4!&apos;); 注意：mysql5.7默认安装了密码安全检查插件（validate_password），默认密码检查策略要求密码必须包含：大小写字母、数字和特殊符号，并且长度不能少于8位。否则会提示ERROR 1819 (HY000): Your password does not satisfy the current policy requirements错误，如下图所示： 通过msyql环境变量可以查看密码策略的相关信息： mysql&gt; show variables like&apos;%password%&apos;; validate_password_policy：密码策略，默认为MEDIUM策略 validate_password_dictionary_file：密码策略文件，策略为STRONG才需要 validate_password_length：密码最少长度 validate_password_mixed_case_count：大小写字符长度，至少1个 validate_password_number_count ：数字至少1个 validate_password_special_char_count：特殊字符至少1个 上述参数是默认策略MEDIUM的密码检查规则。共有以下几种密码策略：策略 检查规则0 or LOW Length1 or MEDIUM Length; numeric, lowercase/uppercase, and special characters2 or STRONG Length; numeric, lowercase/uppercase, and special characters; dictionary fileMySQL官网密码策略详细说明：http://dev.mysql.com/doc/refman/5.7/en/validate-password-options-variables.html#sysvar_validate_password_policy 修改密码策略在/etc/my.cnf文件添加validate_password_policy配置，指定密码策略 选择0（LOW），1（MEDIUM），2（STRONG）其中一种，选择2需要提供密码字典文件validate_password_policy=0如果不需要密码策略，添加my.cnf文件中添加如下配置禁用即可：validate_password = off重新启动mysql服务使配置生效： systemctl restart mysqld 6、添加远程登录用户默认只允许root帐户在本地登录，如果要在其它机器上连接mysql，必须修改root允许远程连接，或者添加一个允许远程连接的帐户，为了安全起见，我添加一个新的帐户： mysql&gt; GRANT ALL PRIVILEGES ON*.*TO&apos;yangxin&apos;@&apos;%&apos; IDENTIFIED BY&apos;Yangxin0917!&apos;WITH GRANT OPTION; 7、配置默认编码为utf8修改/etc/my.cnf配置文件，在[mysqld]下添加编码配置，如下所示： [mysqld]character_set_server=utf8init_connect=&apos;SET NAMES utf8&apos; 重新启动mysql服务， systemctl restart mysqld 查看数据库默认编码如下所示： 默认配置文件路径： 配置文件：/etc/my.cnf 日志文件：/var/log//var/log/mysqld.log 服务启动脚本：/usr/lib/systemd/system/mysqld.service socket文件：/var/run/mysqld/mysqld.pid]]></content>
@@ -265,14 +254,25 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[读书]]></title>
-    <url>%2Freading%2F</url>
-    <content type="text"></content>
+    <title><![CDATA[mybatis3 中provider的使用]]></title>
+    <url>%2Fjava%2Fmybatis%2Fmybatis%20provider%20%E7%9A%84%E4%BD%BF%E7%94%A8%2F</url>
+    <content type="text"><![CDATA[mybatis3提供了4个**provider注解，分别对应增删改查，分别是:InsertProvider、DeleteProvider、UpdateProvider、SelectProvider;如何使用这些注解呢？ 1.这些注解都有统一的2个入参，一个是type，一个是method。type参数的值是你动态sql的类（A）class文件，method是类（A）中的方法名。当然，这些方法都是动态sql，至于动态sql怎么实现，这就可以发挥你的java基础能力，我是结合了自定义注解和java反射基础知识实现了动态sql。下面结合代码讲解一下实现过程。 2.首先你需要定义一个接口类，这个类提供各种各样的增删改查方法。 下面以@SelectProvider为例，依次描述几种典型的使用场景。 1.使用@SelectProvider@SelectProvider是声明在方法基本上的，这个方法定义在Mapper对应的的interface上。 12345public interface UserMapper &#123; @SelectProvider(type = SqlProvider.class, method = "selectUser") @ResultMap("userMap") public User getUser(long userId);&#125; 上例中是个很简单的Mapper接口，其中定义了一个方法：getUser，这个方法根据提供的用户id来查询用户信息，并返回一个User实体bean。这是一个很简单很常用的查询场景：根据key来查询记录并将结果封装成实体bean。其中：@SelectProvider注解用于生成查询用的sql语句，有别于@Select注解，@SelectProvide指定一个Class及其方法，并且通过调用Class上的这个方法来获得sql语句。在我们这个例子中，获取查询sql的方法是SqlProvider.selectUser。@ResultMap注解用于从查询结果集RecordSet中取数据然后拼装实体bean。 2.定义拼装sql的类@SelectProvide中type参数指定的Class类，必须要能够通过无参的构造函数来初始化。@SelectProvide中method参数指定的方法，必须是public的，返回值必须为String，可以为static。12345public class SqlProvider &#123; public String selectUser(long userId) &#123; return "select * from user where userId=" + userId; &#125;&#125; 上面的就是个简单使用，就可以在mybatis中拼接sql了，有这个之后就可以改造mybatis用实体来查询了，就像hibernate一样了。 附加几个mybatis中不常用但很有意思的OGNL用法。 e.method(args) : 调用对象的方法 e.property： 对象属性值，可以多层嵌套使用， e1[e2] :按索引取值（list，数组和map，map使用的时候注意key一样的存在，不存在会报错的） @class@method(args):调用类的静态方法 @class@field:调用类的静态字段值]]></content>
+      <categories>
+        <category>mybatis</category>
+      </categories>
+      <tags>
+        <tag>mybatis</tag>
+      </tags>
   </entry>
   <entry>
     <title><![CDATA[关于我]]></title>
     <url>%2Fabout%2F</url>
     <content type="text"><![CDATA[2013年大学本科毕业,一直从事java编程的工作,从懵懵懂懂技术人员到现在认为有点技术的人员(要谦虚). 熟悉Java开发，熟悉集合、多线程、IO、异常等常用JDK库；熟悉JavaEE开发，能熟练使用SSH等常见非EJB框架；了解网络、缓存、存储、队列、消息；经常关注GitHub或者开源开源中国里面的开源项目；有使用Netty做网络通信的项目经验。 熟练运用Spring、Hibernate、MyBatis、Struts2、SpringMVC等主流开源框架，独立集成SSH/SSM框架进行轻量级web应用开发；同时也关注国内开源框架，Nutz，Jfinal，Beetle等 熟练掌握Oracle和MySQL的常用命令和内部表结构关系，善于编写存储过程、函数。 熟练使用Linux及其常用Shell命令，可以进行Shell/Python脚本开发。 熟练掌握HTML/CSS、Javascript等Web页面技术, 熟悉使用Bootstrap、Jquery, Ajax，Json、Xml。 熟练使用SVN版本控制，熟悉使用GIT版本控制。熟悉使用Maven。了解OSGI开发。]]></content>
+  </entry>
+  <entry>
+    <title><![CDATA[读书]]></title>
+    <url>%2Freading%2F</url>
+    <content type="text"></content>
   </entry>
   <entry>
     <title><![CDATA[java基础题1]]></title>

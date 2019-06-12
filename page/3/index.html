@@ -777,195 +777,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://weiyuanbiao.cn/java/mybatis/mybatis provider 的使用/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Sherwin Wei">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="程序员Sherwin">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/java/mybatis/mybatis provider 的使用/" class="post-title-link" itemprop="url">mybatis3 中provider的使用</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-03-15 17:35:41" itemprop="dateCreated datePublished" datetime="2018-03-15T17:35:41+08:00">2018-03-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-01-23 17:11:07" itemprop="dateModified" datetime="2019-01-23T17:11:07+08:00">2019-01-23</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p> mybatis3提供了4个**provider注解，分别对应增删改查，分别是:InsertProvider、DeleteProvider、UpdateProvider、SelectProvider;如何使用这些注解呢？</p>
-<p>1.这些注解都有统一的2个入参，一个是type，一个是method。type参数的值是你动态sql的类（A）class文件，method是类（A）中的方法名。当然，这些方法都是动态sql，至于动态sql怎么实现，这就可以发挥你的java基础能力，我是结合了自定义注解和java反射基础知识实现了动态sql。下面结合代码讲解一下实现过程。</p>
-<p>2.首先你需要定义一个接口类，这个类提供各种各样的增删改查方法。</p>
-<p>下面以@SelectProvider为例，依次描述几种典型的使用场景。</p>
-<p>1.使用@SelectProvider<br>@SelectProvider是声明在方法基本上的，这个方法定义在Mapper对应的的interface上。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserMapper</span> </span>&#123;</span><br><span class="line">     <span class="meta">@SelectProvider</span>(type = SqlProvider.class, method = <span class="string">"selectUser"</span>)</span><br><span class="line">     <span class="meta">@ResultMap</span>(<span class="string">"userMap"</span>)</span><br><span class="line">     <span class="function"><span class="keyword">public</span> User <span class="title">getUser</span><span class="params">(<span class="keyword">long</span> userId)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>上例中是个很简单的Mapper接口，其中定义了一个方法：getUser，这个方法根据提供的用户id来查询用户信息，并返回一个User实体bean。<br>这是一个很简单很常用的查询场景：根据key来查询记录并将结果封装成实体bean。其中：<br>@SelectProvider注解用于生成查询用的sql语句，有别于@Select注解，@SelectProvide指定一个Class及其方法，并且通过调用Class上的这个方法来获得sql语句。在我们这个例子中，获取查询sql的方法是SqlProvider.selectUser。<br>@ResultMap注解用于从查询结果集RecordSet中取数据然后拼装实体bean。</p>
-<p>2.定义拼装sql的类<br>@SelectProvide中type参数指定的Class类，必须要能够通过无参的构造函数来初始化。<br>@SelectProvide中method参数指定的方法，必须是public的，返回值必须为String，可以为static。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SqlProvider</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">selectUser</span><span class="params">(<span class="keyword">long</span> userId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"select * from user where userId="</span> + userId;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>上面的就是个简单使用，就可以在mybatis中拼接sql了，有这个之后就可以改造mybatis用实体来查询了，就像hibernate一样了。</p>
-<p>附加几个mybatis中不常用但很有意思的OGNL用法。</p>
-<ul>
-<li>e.method(args) : 调用对象的方法</li>
-<li>e.property： 对象属性值，可以多层嵌套使用，</li>
-<li>e1[e2] :按索引取值（list，数组和map，map使用的时候注意key一样的存在，不存在会报错的）</li>
-<li>@class@method(args):调用类的静态方法</li>
-<li>@class@field:调用类的静态字段值</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://weiyuanbiao.cn/linux/centos安装常用工具/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1197,7 +1008,7 @@ shell&gt; mysql -uroot-pmysql&gt; ALTER USER &apos;root&apos;@&apos;localhost&ap
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://weiyuanbiao.cn/reading/">
+    <link itemprop="mainEntityOfPage" href="http://weiyuanbiao.cn/java/mybatis/mybatis provider 的使用/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Sherwin Wei">
@@ -1217,7 +1028,7 @@ shell&gt; mysql -uroot-pmysql&gt; ALTER USER &apos;root&apos;@&apos;localhost&ap
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/reading/" class="post-title-link" itemprop="url">读书</a>
+                <a href="/java/mybatis/mybatis provider 的使用/" class="post-title-link" itemprop="url">mybatis3 中provider的使用</a>
               
             
           </h1>
@@ -1242,7 +1053,7 @@ shell&gt; mysql -uroot-pmysql&gt; ALTER USER &apos;root&apos;@&apos;localhost&ap
                 
               
 
-              <time title="创建时间：2018-01-15 17:35:41" itemprop="dateCreated datePublished" datetime="2018-01-15T17:35:41+08:00">2018-01-15</time>
+              <time title="创建时间：2018-03-15 17:35:41" itemprop="dateCreated datePublished" datetime="2018-03-15T17:35:41+08:00">2018-03-15</time>
             
 
             
@@ -1264,6 +1075,24 @@ shell&gt; mysql -uroot-pmysql&gt; ALTER USER &apos;root&apos;@&apos;localhost&ap
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/mybatis/" itemprop="url" rel="index"><span itemprop="name">mybatis</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -1295,7 +1124,24 @@ shell&gt; mysql -uroot-pmysql&gt; ALTER USER &apos;root&apos;@&apos;localhost&ap
       
         
           
-            
+            <p> mybatis3提供了4个**provider注解，分别对应增删改查，分别是:InsertProvider、DeleteProvider、UpdateProvider、SelectProvider;如何使用这些注解呢？</p>
+<p>1.这些注解都有统一的2个入参，一个是type，一个是method。type参数的值是你动态sql的类（A）class文件，method是类（A）中的方法名。当然，这些方法都是动态sql，至于动态sql怎么实现，这就可以发挥你的java基础能力，我是结合了自定义注解和java反射基础知识实现了动态sql。下面结合代码讲解一下实现过程。</p>
+<p>2.首先你需要定义一个接口类，这个类提供各种各样的增删改查方法。</p>
+<p>下面以@SelectProvider为例，依次描述几种典型的使用场景。</p>
+<p>1.使用@SelectProvider<br>@SelectProvider是声明在方法基本上的，这个方法定义在Mapper对应的的interface上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserMapper</span> </span>&#123;</span><br><span class="line">     <span class="meta">@SelectProvider</span>(type = SqlProvider.class, method = <span class="string">"selectUser"</span>)</span><br><span class="line">     <span class="meta">@ResultMap</span>(<span class="string">"userMap"</span>)</span><br><span class="line">     <span class="function"><span class="keyword">public</span> User <span class="title">getUser</span><span class="params">(<span class="keyword">long</span> userId)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上例中是个很简单的Mapper接口，其中定义了一个方法：getUser，这个方法根据提供的用户id来查询用户信息，并返回一个User实体bean。<br>这是一个很简单很常用的查询场景：根据key来查询记录并将结果封装成实体bean。其中：<br>@SelectProvider注解用于生成查询用的sql语句，有别于@Select注解，@SelectProvide指定一个Class及其方法，并且通过调用Class上的这个方法来获得sql语句。在我们这个例子中，获取查询sql的方法是SqlProvider.selectUser。<br>@ResultMap注解用于从查询结果集RecordSet中取数据然后拼装实体bean。</p>
+<p>2.定义拼装sql的类<br>@SelectProvide中type参数指定的Class类，必须要能够通过无参的构造函数来初始化。<br>@SelectProvide中method参数指定的方法，必须是public的，返回值必须为String，可以为static。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SqlProvider</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">selectUser</span><span class="params">(<span class="keyword">long</span> userId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"select * from user where userId="</span> + userId;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的就是个简单使用，就可以在mybatis中拼接sql了，有这个之后就可以改造mybatis用实体来查询了，就像hibernate一样了。</p>
+<p>附加几个mybatis中不常用但很有意思的OGNL用法。</p>
+<ul>
+<li>e.method(args) : 调用对象的方法</li>
+<li>e.property： 对象属性值，可以多层嵌套使用，</li>
+<li>e1[e2] :按索引取值（list，数组和map，map使用的时候注意key一样的存在，不存在会报错的）</li>
+<li>@class@method(args):调用类的静态方法</li>
+<li>@class@field:调用类的静态字段值</li>
+</ul>
+
           
         
       
@@ -1459,6 +1305,160 @@ shell&gt; mysql -uroot-pmysql&gt; ALTER USER &apos;root&apos;@&apos;localhost&ap
 <li>熟练使用SVN版本控制，熟悉使用GIT版本控制。熟悉使用Maven。了解OSGI开发。</li>
 </ol>
 
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://weiyuanbiao.cn/reading/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sherwin Wei">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Sherwin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/reading/" class="post-title-link" itemprop="url">读书</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-01-15 17:35:41" itemprop="dateCreated datePublished" datetime="2018-01-15T17:35:41+08:00">2018-01-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-01-23 17:11:07" itemprop="dateModified" datetime="2019-01-23T17:11:07+08:00">2019-01-23</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
           
         
       

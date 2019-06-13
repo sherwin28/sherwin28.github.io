@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="今天来看看前端的冒泡和事件默认事件如何处理 1.event.stopPropagation()方法这是阻止事件的冒泡方法，不让事件向documen上蔓延，但是默认事件任然会执行，当你掉用这个方法的时候，如果点击一个连接，这个连接仍然会被打开， 2.event.preventDefault()方法这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素； 3.">
+  <meta name="description" content="今天来看看前端的冒泡和事件默认事件如何处理 1.event.stopPropagation()方法这是阻止事件的冒泡方法，不让事件向documen上蔓延，但是默认事件任然会执行，当你掉用这个方法的时候，如果点击一个连接，这个连接仍然会被打开， 2.event.preventDefault()方法这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素；">
 <meta name="keywords" content="web前端">
 <meta property="og:type" content="article">
 <meta property="og:title" content="阻止事件冒泡，阻止默认事件，event.stopPropagation()和event.preventDefault()，return false的区别">
 <meta property="og:url" content="http://weiyuanbiao.cn/web前端/阻止事件冒泡，阻止默认事件/index.html">
 <meta property="og:site_name" content="程序员Sherwin">
-<meta property="og:description" content="今天来看看前端的冒泡和事件默认事件如何处理 1.event.stopPropagation()方法这是阻止事件的冒泡方法，不让事件向documen上蔓延，但是默认事件任然会执行，当你掉用这个方法的时候，如果点击一个连接，这个连接仍然会被打开， 2.event.preventDefault()方法这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素； 3.">
+<meta property="og:description" content="今天来看看前端的冒泡和事件默认事件如何处理 1.event.stopPropagation()方法这是阻止事件的冒泡方法，不让事件向documen上蔓延，但是默认事件任然会执行，当你掉用这个方法的时候，如果点击一个连接，这个连接仍然会被打开， 2.event.preventDefault()方法这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素；">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-01-23T09:11:07.841Z">
+<meta property="og:updated_time" content="2019-06-13T03:44:39.155Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="阻止事件冒泡，阻止默认事件，event.stopPropagation()和event.preventDefault()，return false的区别">
-<meta name="twitter:description" content="今天来看看前端的冒泡和事件默认事件如何处理 1.event.stopPropagation()方法这是阻止事件的冒泡方法，不让事件向documen上蔓延，但是默认事件任然会执行，当你掉用这个方法的时候，如果点击一个连接，这个连接仍然会被打开， 2.event.preventDefault()方法这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素； 3.">
+<meta name="twitter:description" content="今天来看看前端的冒泡和事件默认事件如何处理 1.event.stopPropagation()方法这是阻止事件的冒泡方法，不让事件向documen上蔓延，但是默认事件任然会执行，当你掉用这个方法的时候，如果点击一个连接，这个连接仍然会被打开， 2.event.preventDefault()方法这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素；">
 
 
 
@@ -190,7 +190,7 @@
     </div>
     
       
-        <p class="site-subtitle">程序员Sherwin</p>
+        <p class="site-subtitle">有温度的程序员</p>
       
     
     
@@ -259,7 +259,7 @@
 
     
 
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
 
   </li>
         
@@ -276,7 +276,58 @@
 
     
 
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-java高级系列">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/java高级系列/" rel="section"><i class="menu-item-icon fa fa-fw fa-javaGJ"></i> <br>java高级系列</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-java基础">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/java基础/" rel="section"><i class="menu-item-icon fa fa-fw fa-javaJC"></i> <br>java基础</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-java面试">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/java面试/" rel="section"><i class="menu-item-icon fa fa-fw fa-javaMS"></i> <br>java面试</a>
 
   </li>
         
@@ -412,7 +463,7 @@
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Sherwin Wei">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content="做一个有温度有梦想的程序员,坚持到底.">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
@@ -468,7 +519,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-01-23 17:11:07" itemprop="dateModified" datetime="2019-01-23T17:11:07+08:00">2019-01-23</time>
+                <time title="修改时间：2019-06-13 11:44:39" itemprop="dateModified" datetime="2019-06-13T11:44:39+08:00">2019-06-13</time>
               
             
           </span>
@@ -529,7 +580,7 @@
       
         <p>今天来看看前端的冒泡和事件默认事件如何处理</p>
 <h3 id="1-event-stopPropagation-方法"><a href="#1-event-stopPropagation-方法" class="headerlink" title="1.event.stopPropagation()方法"></a>1.event.stopPropagation()方法</h3><p>这是阻止事件的冒泡方法，不让事件向documen上蔓延，但是默认事件任然会执行，当你掉用这个方法的时候，如果点击一个连接，这个连接仍然会被打开，</p>
-<h3 id="2-event-preventDefault-方法"><a href="#2-event-preventDefault-方法" class="headerlink" title="2.event.preventDefault()方法"></a>2.event.preventDefault()方法</h3><p>这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素；</p>
+<h3 id="2-event-preventDefault-方法"><a href="#2-event-preventDefault-方法" class="headerlink" title="2.event.preventDefault()方法"></a>2.event.preventDefault()方法</h3><p>这是阻止默认事件的方法，调用此方法是，连接不会被打开，但是会发生冒泡，冒泡会传递到上一层的父元素；<br><a id="more"></a></p>
 <h3 id="3-return-false-；"><a href="#3-return-false-；" class="headerlink" title="3.return false  ；"></a>3.return false  ；</h3><p>这个方法比较暴力，他会同事阻止事件冒泡也会阻止默认事件；写上此代码，连接不会被打开，事件也不会传递到上一层的父元素；可以理解为return false就等于同时调用了event.stopPropagation()和event.preventDefault()</p>
 <h3 id="4-我们来看看几组demo，使用jquery进行DOM操作"><a href="#4-我们来看看几组demo，使用jquery进行DOM操作" class="headerlink" title="4.我们来看看几组demo，使用jquery进行DOM操作"></a>4.我们来看看几组demo，使用jquery进行DOM操作</h3><p>这是html代码，div里面套了一个a标签，连接到百度</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box1"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"http://www.baidu.com"</span> <span class="attr">target</span>=<span class="string">"_blank"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -614,7 +665,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/java/java 高级系列/9.Java中的锁原理、锁优化、CAS、AQS/" rel="next" title="9.Java中的锁原理、锁优化、CAS、AQS">
+              <a href="/java/java高级系列/9.Java中的锁原理、锁优化、CAS、AQS/" rel="next" title="9.Java中的锁原理、锁优化、CAS、AQS">
                 <i class="fa fa-chevron-left"></i> 9.Java中的锁原理、锁优化、CAS、AQS
               </a>
             
@@ -624,8 +675,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/java/juc/java juc/" rel="prev" title="Java 之 JUC">
-                Java 之 JUC <i class="fa fa-chevron-right"></i>
+              <a href="/java/java高级系列/14.java juc/" rel="prev" title="14.Java 之 JUC">
+                14.Java 之 JUC <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -688,8 +739,10 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Sherwin Wei">
+            
               <p class="site-author-name" itemprop="name">Sherwin Wei</p>
-              <div class="site-description motion-element" itemprop="description"></div>
+              <div class="site-description motion-element" itemprop="description">做一个有温度有梦想的程序员,坚持到底.</div>
           </div>
 
           
@@ -699,7 +752,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -711,32 +764,30 @@
                 <div class="site-state-item site-state-categories">
                   
                     
+                      <a href="/categories">
                     
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">11</span>
-                    <span class="site-state-item-name">分类</span>
                   
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
                 </div>
               
 
@@ -744,6 +795,10 @@
                 
                 
                 <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags">
+                    
                   
                     
                     
@@ -775,7 +830,7 @@
                     
                     <span class="site-state-item-count">13</span>
                     <span class="site-state-item-name">标签</span>
-                  
+                  </a>
                 </div>
               
             </nav>
@@ -816,6 +871,20 @@
           
 
           
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.weiyuanbiao.cn" title="http://blog.weiyuanbiao.cn" rel="noopener" target="_blank">sherwin博客</a>
+                  </li>
+                
+              </ul>
+            </div>
           
 
           
